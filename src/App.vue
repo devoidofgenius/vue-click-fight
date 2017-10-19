@@ -124,7 +124,10 @@ export default {
     },
     surrender() {
       console.log('surrender run')
-      if (this.playerTurn) { this.gameOver = true }
+      if (this.playerTurn) {
+        this.playerHealth = 0
+        this.gameOver = true
+      }
     }
 	}
 }
