@@ -10,13 +10,13 @@
 	<div v-if=!gameOver class="game-wrapper">
 		<div v-if=gameInProgress class="stats">
 			<div class="player-stats">
-				<h1>You <span class="heart">❤️</span> <span>{{ playerHealth }}</span></h1>
+				<h1>You <span class="heart">❤️</span> <span>{{ playerHealth }}</span> <span v-if="healingPoints !== ''" class="healing">+{{ healingPoints }}</span></h1>
 				<div class="healthbar">
 					<div class="current-health" :style="{ width: playerHealth + '%' }"></div>
 				</div>
 			</div>
 			<div class="monster-stats">
-				<h1>Monster <span class="heart">❤️</span> <span>{{ monsterHealth }}</span></h1>
+				<h1>Monster <span class="heart">❤️</span></h1>
 				<div class="healthbar">
 					<div class="current-health" :style="{ width: monsterHealth + '%' }"></div>
 				</div>
@@ -51,21 +51,23 @@ export default {
 		  monsterHealth: 100,
       gameInProgress: false,
       playerTurn: true,
-      gameOver: false
+			gameOver: false,
+			healingPoints: ''
     }
   },
   beforeUpdate: function() {
     if (this.gameOver) {
       setTimeout(() => {
         console.log("NEW GAME")
-        this.playerHealth = 100,
-        this.monsterHealth = 100,
-        this.gameInProgress = false,
+        this.playerHealth = 100
+        this.monsterHealth = 100
+        this.gameInProgress = false
         this.playerTurn = true
-        this.gameOver = false
+				this.gameOver = false
+				this.healingPoints = ''
       }, 3000)
-    }
-  },
+		}
+	},
   methods: {
 		randomNumber: (min, max) => {
 			min = Math.ceil(min)
@@ -95,7 +97,11 @@ export default {
         this.monsterHealth -= this.randomNumber(5, 10)
         this.checkMonsterHealth()
         if (!this.gameOver) {
-          this.monsterAttack(15)
+					if (!this.gameOver) {
+					setTimeout(() => {
+          	this.monsterAttack(15)
+					}, 500)
+        }
         }
       }
 		},
@@ -105,7 +111,9 @@ export default {
         this.monsterHealth -= this.randomNumber(10, 20)
         this.checkMonsterHealth()
         if (!this.gameOver) {
-          this.monsterAttack(25)
+					setTimeout(() => {
+						this.monsterAttack(25)
+					}, 500)
         }
       }
 		},
@@ -113,14 +121,18 @@ export default {
       if (this.playerTurn) {
         this.playerTurn = false
         if (this.playerHealth <= 100) {
-          this.playerHealth += this.randomNumber(5, 20)
+					this.healingPoints = this.randomNumber(5, 10)
+					this.playerHealth += this.healingPoints
           if (this.playerHealth > 100) this.playerHealth = 100
         }
-        this.checkPlayerHealth()
+				this.checkPlayerHealth()
         if (!this.gameOver) {
-          this.monsterAttack(10)
+					setTimeout(() => {
+						this.healingPoints = ''
+          	this.monsterAttack(25)
+					}, 1000)
         }
-      }
+			}
     },
     surrender() {
       console.log('surrender run')
@@ -209,14 +221,29 @@ body {
 			letter-spacing: 0.15em;
 
 			h1 {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
 				text-transform: uppercase;
 				color: #273A44;
+				position: relative;
         span {
           font-size: 0.75em;
         }
         span.heart {
           font-size: 0.5em;
+					padding: 0 0.5em;
         }
+				.healing {
+					font-size: 0.65em;
+					color: #22A369;
+					position: absolute;
+					right: -30px;
+					top: 0;
+					animation-name: fadeInOut;
+					animation-timing-function: ease-in-out;
+					animation-duration: 2250ms;
+				}
 			}
 
 			.healthbar {
@@ -278,5 +305,17 @@ body {
 
 	}
 
+}
+
+@keyframes fadeInOut {
+	0% {
+		opacity: 0;
+	}
+	25%, 50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
 }
 </style>
