@@ -1,5 +1,12 @@
 <template>
 <div id="app">
+  <template v-if=gameOver>
+    <div class="game-over">
+      <h1 class="title">Game Over!</h1>
+      <h2 v-if="playerHealth === 0" class="subtitle">You were slayed by the monster</h2>
+      <h2 v-if="monsterHealth === 0" class="subtitle">You slayed the monster</h2>
+    </div>
+  </template>
 	<div v-if=!gameOver class="game-wrapper">
 		<div v-if=gameInProgress class="stats">
 			<div class="player-stats">
@@ -17,7 +24,7 @@
 		</div>
 		<div class="game-controls">
 			<template v-if=!gameInProgress>
-        <h1 class="title">Click to Kill</h1>
+        <h1 class="title">Click Fight</h1>
 				<div class="actions">
 					<button @click="gameInProgress = !gameInProgress" class="new-game">New Game</button>
 				</div>
@@ -49,11 +56,14 @@ export default {
   },
   beforeUpdate: function() {
     if (this.gameOver) {
-      this.playerHealth = 100,
-		  this.monsterHealth = 100,
-      this.gameInProgress = false,
-      this.playerTurn = true
-      this.gameOver = false
+      setTimeout(() => {
+        console.log("NEW GAME")
+        this.playerHealth = 100,
+        this.monsterHealth = 100,
+        this.gameInProgress = false,
+        this.playerTurn = true
+        this.gameOver = false
+      }, 3000)
     }
   },
   methods: {
@@ -84,7 +94,9 @@ export default {
         this.playerTurn = false
         this.monsterHealth -= this.randomNumber(5, 10)
         this.checkMonsterHealth()
-        this.monsterAttack(15)
+        if (!this.gameOver) {
+          this.monsterAttack(15)
+        }
       }
 		},
 		magicAttack() {
@@ -92,7 +104,9 @@ export default {
         this.playerTurn = false
         this.monsterHealth -= this.randomNumber(10, 20)
         this.checkMonsterHealth()
-        this.monsterAttack(25)
+        if (!this.gameOver) {
+          this.monsterAttack(25)
+        }
       }
 		},
 		healingSpell() {
@@ -103,7 +117,9 @@ export default {
           if (this.playerHealth > 100) this.playerHealth = 100
         }
         this.checkPlayerHealth()
-        this.monsterAttack(10)
+        if (!this.gameOver) {
+          this.monsterAttack(10)
+        }
       }
     },
     surrender() {
@@ -135,6 +151,7 @@ body {
 		display: flex;
 		justify-content: center;
 		align-items: center;
+
     .title {
       text-transform: uppercase;
       font-family: $baloo;
@@ -142,8 +159,26 @@ body {
       color: #273A44;
       font-size: 5em;
       text-align: center;
-      margin: 1em 0;
+      margin: 0;
     }
+
+    .game-over {
+
+      .title {
+        color: #F62713;
+      }
+      .subtitle {
+        text-transform: uppercase;
+        font-family: $baloo;
+        letter-spacing: 0.15em;
+        color: #273A44;
+        font-size: 2.5em;
+        text-align: center;
+        margin: 0;
+      }
+
+    }
+
 	}
 
 }
